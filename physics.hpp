@@ -33,5 +33,10 @@ namespace phy
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
 	};
 }
+float phy::vec3::calcMag()
+{
+	float a = (x*x)+(y*y)+(z*z);
+	return sqrt(a);
+}
 
 #endif
