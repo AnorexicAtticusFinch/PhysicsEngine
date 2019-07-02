@@ -17,7 +17,31 @@ namespace phy
 			float calcMag(); //Calculates the magnitude
 			
 			//Operator overloading for +, -, * (Scalar multiplication), / (Same as scalar multiplication)
-			
+			vec3 operator +(vec3 const quantity)
+			{
+				vec3 result;
+				result.x = x + quantity.x;
+				result.y = y + quantity.y;
+				result.z = z + quantity.z;
+				return result;
+			}	
+			float operator *(vec3 const quantity)
+			{
+				vec3 res;
+				res.x = x * quantity.x;
+				res.y = y * quantity.y;
+				res.z = z * quantity.z;
+				float final = res.x + res.y + res.z;
+				return final;
+			}		
+			vec3 operator -(vec3 const quantity)
+			{
+				vec3 result;
+				result.x = x - quantity.x;
+				result.y = y - quantity.y;
+				result.z = z - quantity.z;
+				return result;
+			}	
 			//Functions for cross and dot product
 	};
 	
