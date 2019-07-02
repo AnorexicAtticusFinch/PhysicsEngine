@@ -13,7 +13,13 @@ namespace phy
 			float x;
 			float y;
 			float z;
-		
+			vec3()
+			{
+				x=0;
+				y=0;
+				z=0;
+			}
+
 			float calcMag(); //Calculates the magnitude
 			
 			//Operator overloading for +, -, * (Scalar multiplication), / (Same as scalar multiplication)
@@ -25,7 +31,7 @@ namespace phy
 				result.z = z + quantity.z;
 				return result;
 			}	
-			vec3 operator *(float const quantity)
+			vec3 operator *(float const quantity)//Scalar Product
 			{
 				vec3 res;
 				res.x = x * quantity;
@@ -42,7 +48,8 @@ namespace phy
 				return result;
 			}	
 			//Functions for cross and dot product
-			float DotProduct(vec3 const object);			
+			float DotProduct(vec3 const object);
+			vec3 CrossProduct(vec3 const object);			
 	};
 	
 	class PhysicsObj
@@ -55,6 +62,7 @@ namespace phy
 			vector<vec3> forces;
 			
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
+			vec3 TotalForce(const vector<vec3> object);
 	};
 }
 float phy::vec3::calcMag()
@@ -70,6 +78,26 @@ float phy::vec3::DotProduct(vec3 const object)
 	res.z = z * object.z;
 	float result = res.x + res.y + res.z;
 	return result;
+}
+vec3 phy::vec3::CrossProduct(vec3 const object)
+{
+	vec3 res;
+	res.x = (y*object.z) - (z*object.y);
+	res.y = (z*object.x) - (x*object.z);
+	res.z = (x*object.y) - (y*object.x);
+	return res;
+}
+vec3 phy::PhysicsObj::TotalForce(const vector<vec3> object )
+{
+	vec3 ResultantForce;
+	for(int i=0;i<object.size();i++)
+	{
+		ResultantForce.x += object[i].x;
+		ResultantForce.y += object[i].y;
+		ResultantForce.z += object[i].z;
+
+	}
+	return ResultantForce;
 }
 
 #endif
