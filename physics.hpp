@@ -57,7 +57,7 @@ namespace phy
 			{ 
 			  forces.push_back(NEWFORCE);
 			  
-			}
+			}//to append a new added force
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
 	};
 }
