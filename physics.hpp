@@ -91,7 +91,7 @@ vec3 phy::vec3::CrossProduct(vec3 const object)
 	res.z = (x*object.y) - (y*object.x);
 	return res;
 }
-vec3 phy::PhysicsObj::TotalForce()
+vec3 phy::PhysicsObj::TotalForce()// Returns total forces
 {
 	vec3 ResultantForce;
 	for(int i=0;i<forces.size();i++)
