@@ -67,6 +67,7 @@ namespace phy
 			}//to append a new added force
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
 			vec3 TotalForce();//No parameter and forces vector is used in the function
+			void CalcVelocity();
 	};
 }
 float phy::vec3::calcMag()
@@ -102,6 +103,18 @@ vec3 phy::PhysicsObj::TotalForce()// Returns total forces
 
 	}
 	return ResultantForce;
+}
+void phy::PhysicsObj::CalcVelocity()
+{
+	vec3 force = TotalForce();
+	vec3 accelaration;//accelaration at the center of mass
+	accelaration.x = force.x/mass;
+	accelaration.y = force.y/mass;
+	accelaration.z = force.z/mass;
+	//Function should be called every second so that velocity and accelaration get adjusted. Keeping that in mind i have used the below formulae
+	vel.x += accelaration.x;
+	vel.y += accelaration.y;
+	vel.z += accelaration.z;
 }
 
 #endif
