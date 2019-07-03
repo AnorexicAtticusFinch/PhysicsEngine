@@ -62,7 +62,7 @@ namespace phy
 			vector<vec3> forces;
 			
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
-			vec3 TotalForce(const vector<vec3> object);
+			vec3 TotalForce();
 	};
 }
 float phy::vec3::calcMag()
@@ -87,14 +87,14 @@ vec3 phy::vec3::CrossProduct(vec3 const object)
 	res.z = (x*object.y) - (y*object.x);
 	return res;
 }
-vec3 phy::PhysicsObj::TotalForce(const vector<vec3> object )
+vec3 phy::PhysicsObj::TotalForce()
 {
 	vec3 ResultantForce;
-	for(int i=0;i<object.size();i++)
+	for(int i=0;i<forces.size();i++)
 	{
-		ResultantForce.x += object[i].x;
-		ResultantForce.y += object[i].y;
-		ResultantForce.z += object[i].z;
+		ResultantForce.x += forces[i].x;
+		ResultantForce.y += forces[i].y;
+		ResultantForce.z += forces[i].z;
 
 	}
 	return ResultantForce;
