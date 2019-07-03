@@ -62,7 +62,7 @@ namespace phy
 			vector<vec3> forces;
 			
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
-			vec3 TotalForce();
+			vec3 TotalForce();//No parameter and forces vector is used in the function
 	};
 }
 float phy::vec3::calcMag()
