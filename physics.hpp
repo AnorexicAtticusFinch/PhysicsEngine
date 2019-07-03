@@ -53,7 +53,11 @@ namespace phy
 			vec3 COM; //Coordinate of the centre of mass
 			vec3 vel; //Velocity of the centre of mass
 			vector<vec3> forces;
-			
+			void addforce(vec3 NEWFORCE)
+			{ 
+			  forces.push_back(NEWFORCE);
+			  
+			}
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
 	};
 }
