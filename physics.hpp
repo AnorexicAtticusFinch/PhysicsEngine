@@ -13,12 +13,8 @@ namespace phy
 			float x;
 			float y;
 			float z;
-			vec3()
-			{
-				x=0;
-				y=0;
-				z=0;
-			}
+		
+			vec3();
 
 			float CalcMag(); //Calculates the magnitude
 			
@@ -80,11 +76,24 @@ namespace phy
 			virtual bool isColliding() = 0;
 	};
 }
+
 float phy::vec3::CalcMag()
+=======
+
+vec3()
+{
+	x=0;
+	y=0;
+	z=0;
+}
+
+float phy::vec3::calcMag()
+
 {
 	float a = (x*x)+(y*y)+(z*z);
 	return sqrt(a);
 }
+
 float phy::vec3::DotProduct(vec3 const object)
 {
 	vec3 res;
@@ -94,7 +103,12 @@ float phy::vec3::DotProduct(vec3 const object)
 	float result = res.x + res.y + res.z;
 	return result;
 }
+
 phy::vec3 phy::vec3::CrossProduct(phy::vec3 const object)
+=======
+
+vec3 phy::vec3::CrossProduct(vec3 const object)
+
 {
 	vec3 res;
 	res.x = (y*object.z) - (z*object.y);
@@ -102,7 +116,12 @@ phy::vec3 phy::vec3::CrossProduct(phy::vec3 const object)
 	res.z = (x*object.y) - (y*object.x);
 	return res;
 }
+
 phy::vec3 phy::PhysicsObj::TotalForce()// Returns total forces
+=======
+
+vec3 phy::PhysicsObj::TotalForce()// Returns total forces
+
 {
 	vec3 ResultantForce;
 	for(int i=0;i<forces.size();i++)
@@ -114,7 +133,12 @@ phy::vec3 phy::PhysicsObj::TotalForce()// Returns total forces
 	}
 	return ResultantForce;
 }
+
 void phy::PhysicsObj::update(float timeInterval)
+=======
+
+void phy::PhysicsObj::CalcVelocity()
+
 {
 	vec3 accelaration = TotalForce() / mass;
 	//Function should be called every second so that velocity and accelaration get adjusted. Keeping that in mind i have used the below formulae
