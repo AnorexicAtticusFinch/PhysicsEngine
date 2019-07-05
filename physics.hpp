@@ -77,7 +77,7 @@ namespace phy
 			}
 			void addImpulse(vec3 newImpulse)
 			{ 
-			  impulses.push_back(newImpulse);
+			  impulses.push_back(newImpulse); 
 			  
 			}
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
