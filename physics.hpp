@@ -69,15 +69,23 @@ namespace phy
 			vec3 COM; //Coordinate of the centre of mass
 			vec3 vel; //Velocity of the centre of mass
 			vector<vec3> forces;
+			vector<vec3> impulses;
 			void addForce(vec3 newForce)
 			{ 
 			  forces.push_back(newForce);
 			  
-			}//to append a new added force
+			}
+			void addImpulse(vec3 newImpulse)
+			{ 
+			  impulses.push_back(newImpulse); 
+			  
+			}
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
+			vec3 TotalImpulse();
 			vec3 TotalForce();//No parameter and forces vector is used in the function
 			void update(float timeInterval);
-			vec3 isColliding() ;
+			vec3 isColliding();
+			virtual float CalcVolume();
 	};
 }
 float phy::vec3::CalcMag()
@@ -114,26 +122,54 @@ phy::vec3 phy::PhysicsObj::TotalForce()// Returns total forces
 	}
 	return ResultantForce;
 }
+phy::vec3 phy::PhysicsObj::TotalImpulse()// Returns total forces
+{
+	vec3 ResultantImpulse;
+	for(int i=0;i<forces.size();i++)
+	{
+		ResultantImpulse.x += Impulses[i].x;
+		ResultantImpulse.y += Impulses[i].y;
+		ResultantImpulse.z += Impulses[i].z;
+
+	}
+	return ResultantImpulse;
+}
+
 void phy::PhysicsObj::update(float timeInterval)
 {
 	vec3 accelaration = TotalForce() / mass;
 	//Function should be called every second so that velocity and accelaration get adjusted. Keeping that in mind i have used the below formulae
 	vel = vel + accelaration * timeInterval;
 	COM = COM + vel * timeInterval;
+	vel = vel + (TotalImpulse()/(mass));
 }
 phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj) 
 {
 	bool collision = false;
 	if(*obj.identity == 1 && identity ==1 )
-	{
-		phy::vec3 vdistance;//vector distance
-		vdistance = *obj.COM - COM;
+	{   phy::vec3 imp;
+		phy::vec3 line;//vector distance
+		line = *obj.COM - COM;
 		float sdistance = vdistance.CalcMag(); 
 		float collisiondistance = *obj.radius + radius;
 		if(sdistance>collisiondistance)
 		{
 			collsion = true;
 		}
+	    if(collision ==true)
+	    {
+		    phy::vec3 deltav = *obj.vel-vel ;
+	        phy::vec3 lineunit=(COM-*obj.COM)/line.CalcMag();
+	        float m1=mass;float m2=(*obj.mass);
+	       	imp = ((2*m1*m2)/(m1+m2))*(deltav.DotProduct(lineunit))*(lineunit);//the impulse imparted on body calling the function
+		    addImpulse(imp);
+	     	*obj.addImpulse(-1*imp);
+	    	return imp;
+	    }
+	    imp.x=0;
+		imp.y=0;
+		imp.z=0;
+		return imp;
 	}
 
 }
