@@ -13,8 +13,12 @@ namespace phy
 			float x;
 			float y;
 			float z;
-		
-			vec3();
+			vec3()
+			{
+				x=0;
+				y=0;
+				z=0;
+			}
 
 			float CalcMag(); //Calculates the magnitude
 			
@@ -61,6 +65,7 @@ namespace phy
 		public:
 			
 			float mass;
+			int identity;//identity for a sphere is taken as 1
 			vec3 COM; //Coordinate of the centre of mass
 			vec3 vel; //Velocity of the centre of mass
 			vector<vec3> forces;
@@ -72,28 +77,14 @@ namespace phy
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
 			vec3 TotalForce();//No parameter and forces vector is used in the function
 			void update(float timeInterval);
-
-			virtual bool isColliding() = 0;
+			vec3 isColliding() ;
 	};
 }
-
 float phy::vec3::CalcMag()
-=======
-
-vec3()
-{
-	x=0;
-	y=0;
-	z=0;
-}
-
-float phy::vec3::calcMag()
-
 {
 	float a = (x*x)+(y*y)+(z*z);
 	return sqrt(a);
 }
-
 float phy::vec3::DotProduct(vec3 const object)
 {
 	vec3 res;
@@ -103,12 +94,7 @@ float phy::vec3::DotProduct(vec3 const object)
 	float result = res.x + res.y + res.z;
 	return result;
 }
-
 phy::vec3 phy::vec3::CrossProduct(phy::vec3 const object)
-=======
-
-vec3 phy::vec3::CrossProduct(vec3 const object)
-
 {
 	vec3 res;
 	res.x = (y*object.z) - (z*object.y);
@@ -116,12 +102,7 @@ vec3 phy::vec3::CrossProduct(vec3 const object)
 	res.z = (x*object.y) - (y*object.x);
 	return res;
 }
-
 phy::vec3 phy::PhysicsObj::TotalForce()// Returns total forces
-=======
-
-vec3 phy::PhysicsObj::TotalForce()// Returns total forces
-
 {
 	vec3 ResultantForce;
 	for(int i=0;i<forces.size();i++)
@@ -133,17 +114,28 @@ vec3 phy::PhysicsObj::TotalForce()// Returns total forces
 	}
 	return ResultantForce;
 }
-
 void phy::PhysicsObj::update(float timeInterval)
-=======
-
-void phy::PhysicsObj::CalcVelocity()
-
 {
 	vec3 accelaration = TotalForce() / mass;
 	//Function should be called every second so that velocity and accelaration get adjusted. Keeping that in mind i have used the below formulae
 	vel = vel + accelaration * timeInterval;
 	COM = COM + vel * timeInterval;
+}
+phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj) 
+{
+	bool collision = false;
+	if(*obj.identity == 1 && identity ==1 )
+	{
+		phy::vec3 vdistance;//vector distance
+		vdistance = *obj.COM - COM;
+		float sdistance = vdistance.CalcMag(); 
+		float collisiondistance = *obj.radius + radius;
+		if(sdistance>collisiondistance)
+		{
+			collsion = true;
+		}
+	}
+
 }
 
 #endif
