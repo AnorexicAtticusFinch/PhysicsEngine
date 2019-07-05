@@ -65,6 +65,7 @@ namespace phy
 		public:
 			
 			float mass;
+			int identity;//identity for a sphere is taken as 1
 			vec3 COM; //Coordinate of the centre of mass
 			vec3 vel; //Velocity of the centre of mass
 			vector<vec3> forces;
@@ -76,8 +77,7 @@ namespace phy
 			//Functions for calculating total force, giving an impulse to this body, updating COM coordinate based on velocity and time
 			vec3 TotalForce();//No parameter and forces vector is used in the function
 			void update(float timeInterval);
-
-			virtual bool isColliding() = 0;
+			vec3 isColliding() ;
 	};
 }
 float phy::vec3::CalcMag()
@@ -120,6 +120,22 @@ void phy::PhysicsObj::update(float timeInterval)
 	//Function should be called every second so that velocity and accelaration get adjusted. Keeping that in mind i have used the below formulae
 	vel = vel + accelaration * timeInterval;
 	COM = COM + vel * timeInterval;
+}
+phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj) 
+{
+	bool collision = false;
+	if(*obj.identity == 1 && identity ==1 )
+	{
+		phy::vec3 vdistance;//vector distance
+		vdistance = *obj.COM - COM;
+		float sdistance = vdistance.CalcMag(); 
+		float collisiondistance = *obj.radius + radius;
+		if(sdistance>collisiondistance)
+		{
+			collsion = true;
+		}
+	}
+
 }
 
 #endif
