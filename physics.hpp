@@ -84,7 +84,8 @@ namespace phy
 			vec3 TotalImpulse();
 			vec3 TotalForce();//No parameter and forces vector is used in the function
 			void update(float timeInterval);
-			vec3 isColliding() ;
+			vec3 isColliding();
+			virtual float CalcVolume();
 	};
 }
 float phy::vec3::CalcMag()
@@ -147,14 +148,17 @@ phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj)
 	bool collision = false;
 	if(*obj.identity == 1 && identity ==1 )
 	{   phy::vec3 imp;
+   
 		phy::vec3 vdistance;//vector distance
 		vdistance = *obj.COM - COM;
+
 		float sdistance = vdistance.CalcMag(); 
 		float collisiondistance = *obj.radius + radius;
 		if(sdistance>collisiondistance)
 		{
 			collsion = true;
 		}
+
 	    	if(collision ==true)
 	      {
 		
