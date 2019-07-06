@@ -148,28 +148,30 @@ phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj)
 	bool collision = false;
 	if(*obj.identity == 1 && identity ==1 )
 	{   phy::vec3 imp;
-		phy::vec3 line;//vector distance
-		line = *obj.COM - COM;
+   
+		phy::vec3 vdistance;//vector distance
+		vdistance = *obj.COM - COM;
+
 		float sdistance = vdistance.CalcMag(); 
 		float collisiondistance = *obj.radius + radius;
 		if(sdistance>collisiondistance)
 		{
 			collsion = true;
 		}
-	    if(collision ==true)
-	    {
-		    phy::vec3 deltav = *obj.vel-vel ;
-	        phy::vec3 lineunit=(COM-*obj.COM)/line.CalcMag();
-	        float m1=mass;float m2=(*obj.mass);
+
+	    	if(collision ==true)
+	      {
+		
+	         phy::vec3 line = (COM-*obj.COM)
+	         phy::vec3 deltav = *obj.vel-vel ;
+	         phy::vec3 lineunit=(COM-*obj.COM)/line.CalcMag();
+	         float m1=mass;float m2=(*obj.mass);
 	       	imp = ((2*m1*m2)/(m1+m2))*(deltav.DotProduct(lineunit))*(lineunit);//the impulse imparted on body calling the function
-		    addImpulse(imp);
+		     addImpulse(imp);
 	     	*obj.addImpulse(-1*imp);
 	    	return imp;
-	    }
-	    imp.x=0;
-		imp.y=0;
-		imp.z=0;
-		return imp;
+	       }
+	    imp.x=0;imp.y=0;imp.z=0;return imp;
 	}
 
 }
