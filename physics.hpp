@@ -127,9 +127,9 @@ phy::vec3 phy::PhysicsObj::TotalImpulse()// Returns total forces
 	vec3 ResultantImpulse;
 	for(int i=0;i<forces.size();i++)
 	{
-		ResultantImpulse.x += Impulses[i].x;
-		ResultantImpulse.y += Impulses[i].y;
-		ResultantImpulse.z += Impulses[i].z;
+		ResultantImpulse.x += impulses[i].x;
+		ResultantImpulse.y += impulses[i].y;
+		ResultantImpulse.z += impulses[i].z;
 
 	}
 	return ResultantImpulse;
@@ -140,8 +140,10 @@ void phy::PhysicsObj::update(float timeInterval)
 	vec3 accelaration = TotalForce() / mass;
 	//Function should be called every second so that velocity and accelaration get adjusted. Keeping that in mind i have used the below formulae
 	vel = vel + accelaration * timeInterval;
-	COM = COM + vel * timeInterval;
 	vel = vel + (TotalImpulse()/(mass));
+	COM = COM + vel * timeInterval;
+	
+	impulses.clear(); //Empties the vector
 }
 phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj) 
 {
@@ -173,7 +175,6 @@ phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj)
 	       }
 	    imp.x=0;imp.y=0;imp.z=0;return imp;
 	}
-
 }
 
 #endif
