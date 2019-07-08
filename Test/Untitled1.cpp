@@ -1,5 +1,5 @@
-#include "./../shader.h"
-#include "./../camera.h"
+#include "./shader.h"
+#include "./camera.h"
 
 #include <iostream>
 using namespace std;
@@ -156,50 +156,6 @@ int main()
 
     glBindVertexArray(0);
 
-    //LIGHTING PROPERTIES
-    unsigned int diffTex = get2DTexID("./container2.png");
-    unsigned int specTex = get2DTexID("./container2_specular.png");
-    Material cubeMat;
-    cubeMat.diffuse = 0;
-    cubeMat.specular = 1;
-    cubeMat.shininess = 128;
-
-    pointLight pLight[2];
-    pLight[0].position = glm::vec3(1.2, 0.75, 2);
-    pLight[0].ambient = glm::vec3(0.2, 0.2, 0.2);
-    pLight[0].diffuse = glm::vec3(0, 0, 1);
-    pLight[0].specular = glm::vec3(1.5, 1.5, 1.5);
-    pLight[0].constant = 1;
-    pLight[0].linear = 0.22;
-    pLight[0].quadratic = 0.20;
-
-    pLight[1].position = glm::vec3(-1.2, 0.75, -2);
-    pLight[1].ambient = glm::vec3(0.2, 0.2, 0.2);
-    pLight[1].diffuse = glm::vec3(1, 0, 0);
-    pLight[1].specular = glm::vec3(1.5, 1.5, 1.5);
-    pLight[1].constant = 1;
-    pLight[1].linear = 0.22;
-    pLight[1].quadratic = 0.20;
-
-    dirLight dLight;
-    dLight.direction = glm::vec3(-1, -0.25, -3);
-    dLight.ambient = glm::vec3(0.1, 0.1, 0.1);
-    dLight.diffuse = glm::vec3(1, 1, 1);
-    dLight.specular = glm::vec3(1.5, 1.5, 1.5);
-
-    spotLight sLight;
-    sLight.position = glm::vec3(1.2, 0.75, 2);
-    sLight.direction = glm::vec3(-1, -0.25, -3);
-    sLight.ambient = glm::vec3(0.4, 0.4, 0.4);
-    sLight.diffuse = glm::vec3(1, 1, 1);
-    sLight.specular = glm::vec3(1.5, 1.5, 1.5);
-    sLight.constant = 1;
-    sLight.linear = 0.14;
-    sLight.quadratic = 0.07;
-    sLight.innerCutoff = cos(glm::radians(10.5f));
-    sLight.outerCutoff = cos(glm::radians(22.5f));
-    //
-
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 500.0f);
     glm::mat4 transform;
 
@@ -231,38 +187,15 @@ int main()
 
         transform = projection * cam.getViewMatrix();
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, diffTex);
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, specTex);
-
-        sLight.position = cam.getPos();
-        sLight.direction = cam.getFront();
-
         cubeShader.use();
         cubeShader.setFMat4Uniform("transform", transform);
-        cubeShader.setMaterialUniform("mat", cubeMat);
-        cubeShader.setFVec3Uniform("camPos", cam.getPos());
-
-        //LIGHTING PROPERTIES
-        cubeShader.setDirLightMaterialUniform("dLights[0]", dLight);
-        cubeShader.setIntUniform("numDirLights", 1);
-
-        cubeShader.setPointLightMaterialUniform("pLights[0]", pLight[0]);
-        cubeShader.setPointLightMaterialUniform("pLights[1]", pLight[1]);
-        cubeShader.setIntUniform("numPointLights", 2);
-
-        cubeShader.setSpotLightMaterialUniform("sLights[0]", sLight);
-        cubeShader.setIntUniform("numSpotLights", 1);
-        //
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glBindVertexArray(0);
 
-        glfwSwapInterval(1);
+        glfwSwapInterval(1); //Limits fps to screen refresh rate
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

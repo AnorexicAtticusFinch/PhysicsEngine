@@ -140,10 +140,11 @@ void phy::PhysicsObj::update(float timeInterval)
 	vec3 accelaration = TotalForce() / mass;
 	//Function should be called every second so that velocity and accelaration get adjusted. Keeping that in mind i have used the below formulae
 	vel = vel + accelaration * timeInterval;
-	vel = vel + (TotalImpulse()/(mass));
-	COM = COM + vel*timeInterval;
+	vel = vel + (TotalImpulse()/(mass);
+	COM = COM + vel * timeInterval;
+	
+	impulses.clear(); //Empties the vector
 
-	impulses.clear();
 }
 phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj) 
 {

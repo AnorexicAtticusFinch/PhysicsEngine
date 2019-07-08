@@ -1,18 +1,127 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "./../glad.c"
+#include "./glad.c"
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
 #include <glm/glm.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "./../stb_image.h"
+#include "./stb_image.h"
 
 #include <iostream>
 #include <fstream>
+#include <string>
 using namespace std;
+
+struct simpleMaterial
+{
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
+};
+
+struct Material
+{
+    int diffuse; //Texture Unit
+    int specular; //Texture Unit
+    float shininess;
+};
+
+class Light
+{
+    public:
+
+        glm::vec3 ambient;
+        glm::vec3 diffuse;
+        glm::vec3 specular;
+
+        Light();
+        Light(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+};
+
+Light::Light()
+{   
+}
+
+Light::Light(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)
+{
+    this -> ambient = ambient;
+    this -> diffuse = diffuse;
+    this -> specular = specular;
+}
+
+class pointLight : public Light
+{
+    public:
+
+        glm::vec3 position;
+        float constant;
+        float linear;
+        float quadratic;
+
+        pointLight();
+        pointLight(glm::vec3 position, float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+};
+
+pointLight::pointLight()
+{   
+}
+
+pointLight::pointLight(glm::vec3 position, float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular) : 
+    Light(ambient, diffuse, specular)
+{
+    this -> position = position;
+    this -> constant = constant;
+    this -> linear = linear;
+    this -> quadratic = quadratic;
+}
+
+class dirLight : public Light
+{
+    public:
+
+        glm::vec3 direction;
+
+        dirLight();
+        dirLight(glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+};
+
+dirLight::dirLight()
+{   
+}
+
+dirLight::dirLight(glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular) : 
+    Light(ambient, diffuse, specular)
+{
+    this -> direction = direction;
+}
+
+class spotLight : public pointLight
+{
+    public:
+
+        glm::vec3 direction;
+        float innerCutoff;
+        float outerCutoff;
+
+        spotLight();
+        spotLight(glm::vec3 position, glm::vec3 direction, float innerCutoff, float outerCutoff, float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+};
+
+spotLight::spotLight()
+{   
+}
+
+spotLight::spotLight(glm::vec3 position, glm::vec3 direction, float innerCutoff, float outerCutoff, float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular) : 
+    pointLight(position, constant, linear, quadratic, ambient, diffuse, specular)
+{
+    this -> direction = direction;
+    this -> innerCutoff = innerCutoff;
+    this -> outerCutoff = outerCutoff;
+}
 
 unsigned int get2DTexID(const char* imagePath, bool flipVertically = false)
 {
@@ -48,29 +157,6 @@ unsigned int get2DTexID(const char* imagePath, bool flipVertically = false)
     return texture;
 }
 
-struct simpleMaterial
-{
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    float shininess;
-};
-
-struct Material
-{
-    int diffuse; //Texture Unit
-    int specular; //Texture Unit
-    float shininess;
-};
-
-struct lightMaterial
-{
-    glm::vec3 position;
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-};
-
 class Shader
 {
         unsigned int programID;
@@ -78,6 +164,7 @@ class Shader
     public:
 
         Shader(const char* vertexFilePath, const char* fragmentFilePath);
+        Shader(const char* vertexFilePath, const char* geometryFilePath, const char* fragmentFilePath);
 
         unsigned int getProgramID() const;
         int getUniformLocation(const char* uniformName) const;
@@ -93,7 +180,9 @@ class Shader
         int setFMat4Uniform(const char* uniformName, glm::mat4 matrix) const;
         int setSimpleMaterialUniform(const char* uniformName, simpleMaterial mat) const;
         int setMaterialUniform(const char* uniformName, Material mat) const;
-        int setLightMaterialUniform(const char* uniformName, lightMaterial mat) const;
+        int setPointLightMaterialUniform(const char* uniformName, pointLight mat) const;
+        int setDirLightMaterialUniform(const char* uniformName, dirLight mat) const;
+        int setSpotLightMaterialUniform(const char* uniformName, spotLight mat) const;
 };
 
 Shader::Shader(const char* vertexFilePath, const char* fragmentFilePath)
@@ -164,8 +253,101 @@ Shader::Shader(const char* vertexFilePath, const char* fragmentFilePath)
     }
 
     glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    glDeleteShader(fragment);   
+}
+
+Shader::Shader(const char* vertexFilePath, const char* geometryFilePath, const char* fragmentFilePath)
+{
+    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+
+    ifstream vertexFile, fragmentFile, geometryFile;
+    vertexFile.open(vertexFilePath);
+    fragmentFile.open(fragmentFilePath);
+    geometryFile.open(geometryFilePath);
+
+    string vertexSource, fragmentSource, code, geometrySource;
+
+    while (! vertexFile.eof())
+    {
+        getline(vertexFile, code);
+        vertexSource += code + "\n";
+    }
+    vertexSource += "\0";
+
+    while (! fragmentFile.eof())
+    {
+        getline(fragmentFile, code);
+        fragmentSource += code + "\n";
+    }
+    fragmentSource += "\0";
+
+    while (! geometryFile.eof())
+    {
+        getline(geometryFile, code);
+        geometrySource += code + "\n";
+    }
+    geometrySource += "\0";
+
+    vertexFile.close();
+    fragmentFile.close();
+    geometryFile.close();
     
+    const char* vertexCode = vertexSource.c_str();
+    const char* fragmentCode = fragmentSource.c_str();
+    const char* geometryCode = geometrySource.c_str();
+
+    int success;
+    char infoLog[512];
+
+    unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vertexCode, NULL);
+    glCompileShader(vertex);
+
+    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+    if (! success)
+    {
+        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+        cout << "Error while compiling Vertex Shader: " << infoLog << endl;
+    }
+
+    unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fragmentCode, NULL);
+    glCompileShader(fragment);
+
+    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+    if (! success)
+    {
+        glGetShaderInfoLog(fragment, 512, NULL, infoLog);
+        cout << "Error while compiling Fragment Shader: " << infoLog << endl;
+    }
+
+    unsigned int geometry = glCreateShader(GL_GEOMETRY_SHADER);
+    glShaderSource(geometry, 1, &geometryCode, NULL);
+    glCompileShader(geometry);
+
+    glGetShaderiv(geometry, GL_COMPILE_STATUS, &success);
+    if (! success)
+    {
+        glGetShaderInfoLog(geometry, 512, NULL, infoLog);
+        cout << "Error while compiling Geometry Shader: " << infoLog << endl;
+    }
+
+    programID = glCreateProgram();
+    glAttachShader(programID, vertex);
+    glAttachShader(programID, fragment);
+    glAttachShader(programID, geometry);
+    glLinkProgram(programID);
+
+    glGetProgramiv(programID, GL_LINK_STATUS, &success);
+    if (! success)
+    {
+        glGetProgramInfoLog(programID, 512, NULL, infoLog);
+        cout << "Error while linking Shaders: " << infoLog << endl;
+    }
+
+    glDeleteShader(vertex);
+    glDeleteShader(fragment); 
+    glDeleteShader(geometry);  
 }
 
 unsigned int Shader::getProgramID() const
@@ -302,7 +484,7 @@ int Shader::setMaterialUniform(const char* uniformName, Material mat) const
     return success;
 }
 
-int Shader::setLightMaterialUniform(const char* uniformName, lightMaterial mat) const
+int Shader::setPointLightMaterialUniform(const char* uniformName, pointLight mat) const
 {
     string name = uniformName;
 
@@ -310,6 +492,39 @@ int Shader::setLightMaterialUniform(const char* uniformName, lightMaterial mat) 
     success *= setFVec3Uniform((name + ".diffuse").c_str(), mat.diffuse);
     success *= setFVec3Uniform((name + ".specular").c_str(), mat.specular);
     success *= setFVec3Uniform((name + ".position").c_str(), mat.position);
+    success *= setFloatUniform((name + ".constant").c_str(), mat.constant);
+    success *= setFloatUniform((name + ".linear").c_str(), mat.linear);
+    success *= setFloatUniform((name + ".quadratic").c_str(), mat.quadratic);
+
+    return success;
+}
+
+int Shader::setDirLightMaterialUniform(const char* uniformName, dirLight mat) const
+{
+    string name = uniformName;
+
+    int success = setFVec3Uniform((name + ".ambient").c_str(), mat.ambient);
+    success *= setFVec3Uniform((name + ".diffuse").c_str(), mat.diffuse);
+    success *= setFVec3Uniform((name + ".specular").c_str(), mat.specular);
+    success *= setFVec3Uniform((name + ".direction").c_str(), mat.direction);
+
+    return success;
+}
+
+int Shader::setSpotLightMaterialUniform(const char* uniformName, spotLight mat) const
+{
+    string name = uniformName;
+
+    int success = setFVec3Uniform((name + ".ambient").c_str(), mat.ambient);
+    success *= setFVec3Uniform((name + ".diffuse").c_str(), mat.diffuse);
+    success *= setFVec3Uniform((name + ".specular").c_str(), mat.specular);
+    success *= setFVec3Uniform((name + ".position").c_str(), mat.position);
+    success *= setFVec3Uniform((name + ".direction").c_str(), mat.direction);
+    success *= setFloatUniform((name + ".innerCutoff").c_str(), mat.innerCutoff);
+    success *= setFloatUniform((name + ".outerCutoff").c_str(), mat.outerCutoff);
+    success *= setFloatUniform((name + ".constant").c_str(), mat.constant);
+    success *= setFloatUniform((name + ".linear").c_str(), mat.linear);
+    success *= setFloatUniform((name + ".quadratic").c_str(), mat.quadratic);
 
     return success;
 }

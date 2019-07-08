@@ -1,0 +1,2 @@
+g++ -c -I. Untitled1.cpp
+g++ -o Untitled1.exe Untitled1.o -L. -lglfw3 -lopengl32 -lgdi32
