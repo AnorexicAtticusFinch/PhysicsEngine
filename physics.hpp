@@ -189,7 +189,7 @@ phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj)
 	if (collision)
 	{	
 		vDistance.normalize();
-	    phy::vec3 velDiff = vel - obj->vel;
+	 	phy::vec3 velDiff = vel - obj->vel;
 
 		float impulseMag = 2 * mass * (obj->mass;)
 		impulseMag = impulseMag / (mass + obj->mass);
