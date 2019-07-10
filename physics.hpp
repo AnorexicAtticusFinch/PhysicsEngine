@@ -18,7 +18,7 @@ namespace phy
 			vec3(float, float, float);
 
 			float calcMag(); //Calculates the magnitude of the vector
-			void normalize(); //Makes a unit vector
+			vec3 normalize(); //Makes a unit vector
 
 			//Operator overloading
 			vec3 operator +(vec3 const);
@@ -83,8 +83,16 @@ float phy::vec3::calcMag()
 	float a = (x * x) + (y * y) + (z * z);
 	return sqrt(a);
 }
-
-phy::vec3 operator +(phy::vec3 const quantity)
+phy::vec3 phy::vec3::normalize()
+{
+	phy::vec3 res;
+	float a = calcMag();
+	res.x = x/a;
+	res.y = y/a;
+	res.z = z/a;
+	return res;
+}
+phy::vec3 phy::vec3::operator +(phy::vec3 const quantity)
 {
 	phy::vec3 result;
 	result.x = x + quantity.x;
@@ -93,7 +101,7 @@ phy::vec3 operator +(phy::vec3 const quantity)
 	return result;
 }
 
-phy::vec3 operator -(phy::vec3 const quantity)
+phy::vec3 phy::vec3::operator -(phy::vec3 const quantity)
 {
 	phy::vec3 result;
 	result.x = x - quantity.x;
@@ -102,7 +110,7 @@ phy::vec3 operator -(phy::vec3 const quantity)
 	return result;
 }
 
-phy::vec3 operator *(float const quantity)
+phy::vec3 phy::vec3::operator *(float const quantity)
 {
 	phy::vec3 res;
 	res.x = x * quantity;
@@ -111,13 +119,37 @@ phy::vec3 operator *(float const quantity)
 	return res; 
 }
 
-phy::vec3 operator /(float const quantity)
+phy::vec3 phy::vec3::operator /(float const quantity)
 {
 	phy::vec3 res;
 	res.x = x / quantity;
 	res.y = y / quantity;
 	res.z = z / quantity;
 	return res; 
+}
+void phy::vec3::operator +=(phy::vec3 quantity)
+{
+	x = x + quantity.x;
+	y = y + quantity.y;
+	z = z + quantity.z;
+} 
+void phy::vec3::operator -=(phy::vec3 quantity)
+{
+	x = x - quantity.x;
+	y = y - quantity.y;
+	z = z - quantity.z;
+}
+void phy::vec3::operator *=(float quantity)
+{
+	x = x*quantity;
+	y = y*quantity;
+	z = z*quantity;
+}
+void phy::vec3::operator /=(float quantity)
+{
+	x = x/quantity;
+	y = y/quantity;
+	z = z/quantity;
 }
 
 float phy::vec3::dotProduct(phy::vec3 const object)
