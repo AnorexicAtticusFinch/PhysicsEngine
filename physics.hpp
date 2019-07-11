@@ -26,10 +26,10 @@ namespace phy
 			vec3 operator *(float const); //Scalar product
 			vec3 operator /(float const); //Scalar division
 
-			void operator +=(vec3 const);
-			void operator -=(vec3 const);
-			void operator *=(float const); //Scalar product
-			void operator /=(float const); //Scalar division
+			vec3& operator +=(vec3 const);
+			vec3& operator -=(vec3 const);
+			vec3& operator *=(float const); //Scalar product
+			vec3& operator /=(float const); //Scalar division
 
 			float dotProduct(vec3 const);
 			vec3 crossProduct(vec3 const);		
@@ -78,11 +78,19 @@ phy::vec3()
 	z = 0;
 }
 
+phy::vec3(float x, float y, float z)
+{
+	this->x = x;
+	this->y = y;
+	this->z = z;
+}
+
 float phy::vec3::calcMag()
 {
 	float a = (x * x) + (y * y) + (z * z);
 	return sqrt(a);
 }
+
 phy::vec3 phy::vec3::normalize()
 {
 	phy::vec3 res;
@@ -92,6 +100,7 @@ phy::vec3 phy::vec3::normalize()
 	res.z = z/a;
 	return res;
 }
+
 phy::vec3 phy::vec3::operator +(phy::vec3 const quantity)
 {
 	phy::vec3 result;
@@ -127,29 +136,37 @@ phy::vec3 phy::vec3::operator /(float const quantity)
 	res.z = z / quantity;
 	return res; 
 }
-void phy::vec3::operator +=(phy::vec3 quantity)
+
+phy::vec3& phy::vec3::operator +=(phy::vec3 const quantity)
 {
 	x = x + quantity.x;
 	y = y + quantity.y;
 	z = z + quantity.z;
+	return *this;
 } 
-void phy::vec3::operator -=(phy::vec3 quantity)
+
+phy::vec3& phy::vec3::operator -=(phy::vec3 const quantity)
 {
 	x = x - quantity.x;
 	y = y - quantity.y;
 	z = z - quantity.z;
+	return *this;
 }
-void phy::vec3::operator *=(float quantity)
+
+phy::vec3& phy::vec3::operator *=(float const quantity)
 {
 	x = x*quantity;
 	y = y*quantity;
 	z = z*quantity;
+	return *this;
 }
-void phy::vec3::operator /=(float quantity)
+
+phy::vec3& phy::vec3::operator /=(float const quantity)
 {
 	x = x/quantity;
 	y = y/quantity;
 	z = z/quantity;
+	return *this;
 }
 
 float phy::vec3::dotProduct(phy::vec3 const object)
@@ -186,7 +203,7 @@ phy::vec3 phy::PhysicsObj::totalForce()
 	phy::vec3 ResultantForce;
 	for (int i = 0; i < forces.size(); i++)
 	{
-		ResultantForce = ResultantForce + forces[i];
+		ResultantForce += forces[i];
 
 	}
 
@@ -198,7 +215,7 @@ phy::vec3 phy::PhysicsObj::totalImpulse()
 	phy::vec3 ResultantImpulse;
 	for (int i = 0; i < forces.size(); i++)
 	{
-		ResultantImpulse = ResultantImpulse + impulses[i];
+		ResultantImpulse += impulses[i];
 	}
 
 	return ResultantImpulse;
@@ -220,26 +237,25 @@ phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj)
 
 	if (collision)
 	{	
-		vDistance.normalize();
+		vDistance = vDistance.normalize();
 	 	phy::vec3 velDiff = vel - obj->vel;
 
 		float impulseMag = 2 * mass * (obj->mass;)
-		impulseMag = impulseMag / (mass + obj->mass);
+		impulseMag /= (mass + obj->mass);
 		impulse = impulseMag * velDiff.dotProduct(vDistance) * vDistance;
 	}
 
 	return impulse;
-
 }
 
 void phy::PhysicsObj::updateMembers(float timeInterval)
 {
 	vec3 acc = TotalForce() / mass;
-	vel = vel + acc * timeInterval;
+	vel += acc * timeInterval;
 
-	vel = vel + TotalImpulse() / mass;
+	vel += TotalImpulse() / mass;
 
-	COM = COM + vel * timeInterval;
+	COM += vel * timeInterval;
 	
 	impulses.clear(); //Empties the impulses vector
 }
