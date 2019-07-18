@@ -48,8 +48,8 @@ namespace phy
 			vec3 COM; //Coordinate of the centre of mass
 			vec3 vel; //Velocity of the centre of mass
 
-			vector<vec3> forces;
-			vector<vec3> impulses;
+			std::vector<vec3> forces;
+			std::vector<vec3> impulses;
 
 			PhysicsObj(float, int, vec3, vec3);
 
@@ -71,14 +71,14 @@ namespace phy
 	};
 }
 
-phy::vec3()
+phy::vec3::vec3()
 {
 	x = 0;
 	y = 0;
 	z = 0;
 }
 
-phy::vec3(float x, float y, float z)
+phy::vec3::vec3(float x, float y, float z)
 {
 	this->x = x;
 	this->y = y;
@@ -221,6 +221,7 @@ phy::vec3 phy::PhysicsObj::totalImpulse()
 	return ResultantImpulse;
 }
 
+/*
 phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj) 
 {
 	bool collision = false;
@@ -229,7 +230,7 @@ phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj)
 
 	if (obj->identity == 1 && identity == 1)
 	{
-		if (vDistance.CalcMag() <= (radius + obj->radius))
+		if (vDistance.calcMag() <= (radius + obj->radius))
 		{
 			collision = true;
 		}
@@ -240,20 +241,22 @@ phy::vec3 phy::PhysicsObj::isColliding(phy::PhysicsObj *obj)
 		vDistance = vDistance.normalize();
 	 	phy::vec3 velDiff = vel - obj->vel;
 
-		float impulseMag = 2 * mass * (obj->mass;)
+		float impulseMag = 2 * mass * (obj->mass);
 		impulseMag /= (mass + obj->mass);
-		impulse = impulseMag * velDiff.dotProduct(vDistance) * vDistance;
+		impulse = vDistance;
+		impulse *= impulseMag * velDiff.dotProduct(vDistance);
 	}
 
 	return impulse;
 }
+*/
 
 void phy::PhysicsObj::updateMembers(float timeInterval)
 {
-	vec3 acc = TotalForce() / mass;
+	vec3 acc = totalForce() / mass;
 	vel += acc * timeInterval;
 
-	vel += TotalImpulse() / mass;
+	vel += totalImpulse() / mass;
 
 	COM += vel * timeInterval;
 	
