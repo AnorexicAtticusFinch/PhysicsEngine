@@ -60,7 +60,7 @@ namespace phy
 			vec3 totalForce(); //Runs every frame
 			vec3 totalImpulse(); //Runs every frame
 
-			virtual vec3 isColliding(PhysicsObj*) = 0;
+			//virtual vec3 isColliding(PhysicsObj*) = 0;
 			/*
 				Returns impulse
 				Implemented in child classes (ie the shapes)
@@ -186,6 +186,14 @@ phy::vec3 phy::vec3::crossProduct(phy::vec3 const object)
 	res.y = (z * object.x) - (x * object.z);
 	res.z = (x * object.y) - (y * object.x);
 	return res;
+}
+
+phy::PhysicsObj::PhysicsObj(float mass, int identity, phy::vec3 COM, phy::vec3 vel)
+{
+	this->mass = mass;
+	this->identity = identity;
+	this->COM = COM;
+	this->vel = vel;
 }
 
 void phy::PhysicsObj::addForce(phy::vec3 newForce)
