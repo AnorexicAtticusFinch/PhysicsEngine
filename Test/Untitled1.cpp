@@ -1,5 +1,6 @@
 #include "./shader.h"
 #include "./camera.h"
+#include "./physics.hpp"
 
 #include <iostream>
 using namespace std;
@@ -12,6 +13,12 @@ glm::vec3 camPos(0, 0, 3);
 glm::vec3 camFront(0, 0, -1);
 glm::vec3 worldUp(0, 1, 0);
 Camera cam(camPos, camFront, worldUp);
+
+glm::vec3 phytoglmvec3(phy::vec3 pvec)
+{
+    glm::vec3 gvec(pvec.x, pvec.y, pvec.z);
+    return gvec;
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -157,12 +164,14 @@ int main()
     glBindVertexArray(0);
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 500.0f);
-    glm::mat4 transform;
+    glm::mat4 transform, model(1.0f), unit(1.0f);
 
     float time, deltaTime, lastTime = 0;
 
     int fps = 0;
     float fpsLastTime = 0;
+
+    phy::PhysicsObj pobj(1, 1, phy::vec3(0, 0, 0), phy::vec3(3, 0, 0));
 
     while (! glfwWindowShouldClose(window))
     {
@@ -170,7 +179,7 @@ int main()
 
         time = glfwGetTime();
         deltaTime = time - lastTime;
-        lastTime += deltaTime;
+        lastTime = time;
 
         if (time - fpsLastTime >= 1.0f)
         {
@@ -185,7 +194,9 @@ int main()
 
         keyboard_inputs(window, deltaTime);
 
-        transform = projection * cam.getViewMatrix();
+        pobj.updateMembers(deltaTime);
+        model = glm::translate(unit, phytoglmvec3(pobj.COM));
+        transform = projection * cam.getViewMatrix() * model;
 
         cubeShader.use();
         cubeShader.setFMat4Uniform("transform", transform);
