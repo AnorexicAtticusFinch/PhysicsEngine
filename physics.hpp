@@ -60,7 +60,7 @@ namespace phy
 			vec3 totalForce(); //Runs every frame
 			vec3 totalImpulse(); //Runs every frame
 
-			//virtual vec3 isColliding(PhysicsObj*) = 0;
+			virtual vec3 isColliding(PhysicsObj*) = 0;
 			/*
 				Returns impulse
 				Implemented in child classes (ie the shapes)
